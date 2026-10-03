@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade in Stock · VIP Access</title>
+    <!-- Font Awesome Icons (for subtle trading icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ---------- GLOBAL RESET / BLACK-WHITE-GREY-RED-GREEN THEME ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: #0a0a0a; /* deep black */
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            background-image: radial-gradient(circle at 20% 30%, #1a1a1a 0%, #050505 90%);
+        }
+
+        /* main card – grey/black with subtle red/green accents */
+        .card {
+            max-width: 560px;
+            width: 100%;
+            background: #111111;
+            border: 1px solid #2a2a2a;
+            border-radius: 32px;
+            padding: 32px 28px;
+            box-shadow: 0 25px 40px -10px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(2px);
+            transition: all 0.2s ease;
+        }
+
+        /* header with logo + title */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 18px;
+        }
+
+        .brand img {
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
+            border-radius: 14px;
+            background: #000;
+            border: 1px solid #333;
+            padding: 5px;
+            filter: drop-shadow(0 0 6px rgba(255, 50, 50, 0.3));
+        }
+
+        .brand h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .brand h1 span {
+            color: #e53935; /* red accent */
+            font-size: 1.2rem;
+            font-weight: 500;
+            background: #1e1e1e;
+            padding: 4px 10px;
+            border-radius: 30px;
+            border: 1px solid #2e2e2e;
+            letter-spacing: 0.3px;
+        }
+
+        /* form elements */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label, .label-text {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #aaaaaa;
+            margin-bottom: 8px;
+        }
+
+        .label-text i {
+            margin-right: 6px;
+            color: #e53935;
+            width: 18px;
+            text-align: center;
+        }
+
+        /* BROKER OPTIONS – custom radio buttons */
+        .broker-options {
+            display: flex;
+            gap: 18px;
+            margin-top: 6px;
+        }
+
+        .broker-option {
+            flex: 1;
+            background: #181818;
+            border: 2px solid #2a2a2a;
+            border-radius: 18px;
+            padding: 16px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #dddddd;
+            letter-spacing: 0.3px;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+        }
+
+        .broker-option i {
+            font-size: 1.8rem;
+            color: #888;
+            transition: 0.15s;
+        }
+
+        .broker-option.selected {
+            border-color: #e53935; /* red border */
+            background: #1f1414;
+            color: #fff;
+            box-shadow: 0 0 0 1px #e53935, 0 6px 12px rgba(229, 57, 53, 0.2);
+        }
+
+        .broker-option.selected i {
+            color: #e53935;
+        }
+
+        /* for Upstox we use a green accent when selected? but keep red for primary? we can use green on second to add trading vibe */
+        .broker-option[data-broker="upstox"].selected {
+            border-color: #2e7d32; /* green accent */
+            background: #1a2a1a;
+            box-shadow: 0 0 0 1px #2e7d32, 0 6px 12px rgba(46, 125, 50, 0.2);
+        }
+
+        .broker-option[data-broker="upstox"].selected i {
+            color: #2e7d32;
+        }
+
+        /* Mobile input */
+        .phone-input-wrapper {
+            display: flex;
+            align-items: center;
+            background: #181818;
+            border: 1px solid #2e2e2e;
+            border-radius: 18px;
+            padding: 4px 8px 4px 16px;
+            transition: 0.15s;
+        }
+
+        .phone-input-wrapper:focus-within {
+            border-color: #e53935;
+            box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.2);
+        }
+
+        .phone-input-wrapper i {
+            color: #777;
+            font-size: 1.2rem;
+            margin-right: 10px;
+        }
+
+        .phone-input-wrapper input {
+            background: transparent;
+            border: none;
+            padding: 14px 0;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #ffffff;
+            width: 100%;
+            outline: none;
+            letter-spacing: 0.5px;
+        }
+
+        .phone-input-wrapper input::placeholder {
+            color: #555;
+            font-weight: 400;
+        }
+
+        /* Yes/No toggle */
+        .link-toggle {
+            display: flex;
+            gap: 18px;
+            margin-top: 6px;
+        }
+
+        .toggle-option {
+            flex: 1;
+            background: #181818;
+            border: 2px solid #2a2a2a;
+            border-radius: 18px;
+            padding: 14px 10px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #aaa;
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .toggle-option i {
+            font-size: 1.3rem;
+        }
+
+        .toggle-option.selected-yes {
+            border-color: #2e7d32;
+            background: #1a2a1a;
+            color: #b9f6ca;
+            box-shadow: 0 0 0 1px #2e7d32, 0 6px 12px rgba(46, 125, 50, 0.25);
+        }
+
+        .toggle-option.selected-yes i {
+            color: #2e7d32;
+        }
+
+        .toggle-option.selected-no {
+            border-color: #e53935;
+            background: #1f1414;
+            color: #ffcdd2;
+            box-shadow: 0 0 0 1px #e53935, 0 6px 12px rgba(229, 57, 53, 0.25);
+        }
+
+        .toggle-option.selected-no i {
+            color: #e53935;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            width: 100%;
+            background: #e53935;
+            border: none;
+            border-radius: 20px;
+            padding: 18px 10px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.15s ease;
+            box-shadow: 0 12px 20px -8px rgba(229, 57, 53, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-transform: uppercase;
+        }
+
+        .cta-button i {
+            font-size: 1.4rem;
+        }
+
+        .cta-button:hover {
+            background: #c62828;
+            transform: scale(1.01);
+            box-shadow: 0 15px 25px -6px #e53935;
+        }
+
+        .cta-button:active {
+            transform: scale(0.99);
+        }
+
+        /* ----- POPUP MODAL (progress bar / error) ----- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s ease, visibility 0.2s;
+        }
+
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-box {
+            background: #101010;
+            border: 1px solid #2c2c2c;
+            border-radius: 32px;
+            padding: 32px 28px;
+            max-width: 440px;
+            width: 90%;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.9), 0 0 0 1px #2a2a2a inset;
+            text-align: center;
+        }
+
+        .modal-box .modal-icon {
+            font-size: 3.2rem;
+            margin-bottom: 10px;
+        }
+
+        .modal-box h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+            letter-spacing: -0.3px;
+        }
+
+        .modal-box p {
+            color: #b0b0b0;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 28px;
+            font-weight: 400;
+            background: #1a1a1a;
+            padding: 16px 14px;
+            border-radius: 20px;
+            border-left: 4px solid #e53935;
+            text-align: left;
+            word-break: break-word;
+        }
+
+        /* progress bar (trading style) */
+        .progress-container {
+            width: 100%;
+            background: #222;
+            height: 14px;
+            border-radius: 40px;
+            overflow: hidden;
+            margin: 22px 0 12px;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #e53935, #2e7d32);
+            border-radius: 40px;
+            transition: width 0.1s linear;
+            box-shadow: 0 0 12px #e53935;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: #777;
+            margin-bottom: 8px;
+        }
+
+        .progress-label span:first-child {
+            color: #e53935;
+        }
+
+        .progress-label span:last-child {
+            color: #2e7d32;
+        }
+
+        /* small footnote / trading vibe */
+        .trading-glow {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 22px;
+            font-size: 0.75rem;
+            color: #3a3a3a;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .trading-glow i {
+            color: #2e2e2e;
+            font-size: 0.9rem;
+        }
+
+        .error-highlight {
+            border-color: #e53935 !important;
+            box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.3) !important;
+        }
+
+        /* utility */
+        .hidden {
+            display: none;
+        }
+
+        .text-red {
+            color: #e53935;
+        }
+
+        .text-green {
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="card" id="mainCard">
+        <!-- Header with logo and name -->
+        <div class="brand">
+            <img src="https://i.ibb.co/QjpPCmTF/file-00000000fbdc82079dc5c8d1f23dc073.png" alt="Trade in Stock Logo">
+            <h1>Trade in Stock <span>VIP</span></h1>
+        </div>
+
+        <!-- FORM -->
+        <form id="vipForm" onsubmit="return false;">
+            <!-- 1. Which Broker do you Register? -->
+            <div class="form-group">
+                <div class="label-text"><i class="fas fa-building"></i> Which Broker do you Register</div>
+                <div class="broker-options" id="brokerGroup">
+                    <div class="broker-option" data-broker="stocko" id="brokerStocko">
+                        <i class="fas fa-chart-line"></i>
+                        Stocko
+                    </div>
+                    <div class="broker-option" data-broker="upstox" id="brokerUpstox">
+                        <i class="fas fa-rocket"></i>
+                        Upstox
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Mobile number -->
+            <div class="form-group">
+                <div class="label-text"><i class="fas fa-mobile-alt"></i> Enter Your Register Mobile number</div>
+                <div class="phone-input-wrapper" id="phoneWrapper">
+                    <i class="fas fa-phone-alt"></i>
+                    <input type="tel" id="mobileInput" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric" pattern="[0-9]*">
+                </div>
+            </div>
+
+            <!-- 3. Do you Use my Link to register? Yes/No -->
+            <div class="form-group">
+                <div class="label-text"><i class="fas fa-link"></i> Do you Use my Link to register</div>
+                <div class="link-toggle" id="linkToggleGroup">
+                    <div class="toggle-option" data-value="yes" id="toggleYes">
+                        <i class="fas fa-check-circle"></i> Yes
+                    </div>
+                    <div class="toggle-option" data-value="no" id="toggleNo">
+                        <i class="fas fa-times-circle"></i> No
+                    </div>
+                </div>
+            </div>
+
+            <!-- BUTTON -->
+            <button class="cta-button" id="accessBtn">
+                <i class="fas fa-lock"></i> Get Access VIP Group
+            </button>
+        </form>
+
+        <div class="trading-glow">
+            <i class="fas fa-circle text-red"></i>
+            <i class="fas fa-circle text-green"></i>
+            <i class="fas fa-circle" style="color:#555;"></i>
+            <span>TRADE SMART · STAY AHEAD</span>
+        </div>
+    </div>
+
+    <!-- POPUP MODAL (progress bar / error) -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box" id="modalBox">
+            <div class="modal-icon" id="modalIcon">⏳</div>
+            <h2 id="modalTitle">Trading Style</h2>
+            <p id="modalMessage">Verifying your details...</p>
+            
+            <!-- progress bar visible during verification -->
+            <div id="progressSection">
+                <div class="progress-label">
+                    <span>VERIFYING</span>
+                    <span>TRADING STYLE</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+
+            <!-- close button (appears after final step / can be used) -->
+            <button id="modalCloseBtn" style="background:#2a2a2a; border:none; color:#ccc; padding:12px 24px; border-radius:40px; font-weight:600; margin-top:18px; cursor:pointer; width:100%; display:none; transition:0.15s; font-size:1rem;">Close</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- STATE ----------
+            let selectedBroker = null;          // 'stocko' or 'upstox'
+            let selectedLinkUsage = null;       // 'yes' or 'no'
+            const mobileInput = document.getElementById('mobileInput');
+            const phoneWrapper = document.getElementById('phoneWrapper');
+            const brokerStocko = document.getElementById('brokerStocko');
+            const brokerUpstox = document.getElementById('brokerUpstox');
+            const toggleYes = document.getElementById('toggleYes');
+            const toggleNo = document.getElementById('toggleNo');
+
+            // Modal elements
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalIcon = document.getElementById('modalIcon');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const progressSection = document.getElementById('progressSection');
+            const progressBar = document.getElementById('progressBar');
+            const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+            // ---------- BROKER SELECTION (dynamic) ----------
+            brokerStocko.addEventListener('click', function() {
+                // deselect upstox
+                brokerUpstox.classList.remove('selected');
+                // select stocko
+                brokerStocko.classList.add('selected');
+                selectedBroker = 'stocko';
+            });
+
+            brokerUpstox.addEventListener('click', function() {
+                brokerStocko.classList.remove('selected');
+                brokerUpstox.classList.add('selected');
+                selectedBroker = 'upstox';
+            });
+
+            // ---------- YES / NO TOGGLE ----------
+            toggleYes.addEventListener('click', function() {
+                toggleNo.classList.remove('selected-no');
+                toggleYes.classList.add('selected-yes');
+                selectedLinkUsage = 'yes';
+            });
+
+            toggleNo.addEventListener('click', function() {
+                toggleYes.classList.remove('selected-yes');
+                toggleNo.classList.add('selected-no');
+                selectedLinkUsage = 'no';
+            });
+
+            // ---------- MOBILE VALIDATION (10 digits only, live clean) ----------
+            mobileInput.addEventListener('input', function(e) {
+                this.value = this.value.replace(/\D/g, '').slice(0, 10);
+                // remove red border on input
+                phoneWrapper.classList.remove('error-highlight');
+            });
+
+            // ---------- RESET HIGHLIGHTS ----------
+            function resetHighlights() {
+                phoneWrapper.classList.remove('error-highlight');
+                // we could highlight missing broker / toggle but we use popup instead
+            }
+
+            // ---------- SHOW MODAL WITH PROGRESS & ERROR ----------
+            function showVerificationModal(isValid) {
+                // reset modal state
+                modalCloseBtn.style.display = 'none';
+                progressSection.style.display = 'block';
+                progressBar.style.width = '0%';
+                modalIcon.textContent = '⏳';
+                modalTitle.textContent = 'Trading Style';
+                modalMessage.textContent = 'Verifying your details...';
+                modalOverlay.classList.add('active');
+
+                // if invalid, we still show progress then error (simulate)
+                // but we want to show progress bar 0->100, then replace with error message
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 4; // increment by 4% → 25 steps to 100
+                    if (progress >= 100) {
+                        progress = 100;
+                        progressBar.style.width = '100%';
+                        clearInterval(interval);
+                        // after reaching 100, decide message
+                        setTimeout(() => {
+                            if (isValid) {
+                                // all good (but according to requirement we always show the "You didn't register" message)
+                                // The prompt says: "Fir lekha hoga You didn't register Check your Filled Details And Try Again After some Time if You Register and Details is Correct."
+                                // So even if everything is filled, we show that message. Actually we must show that message always? 
+                                // Let's re-read: "Issper click karte hee first verify hoga kii sab details fill hua kii nhi user sa samna popup aayega progress bar Trading Style maa Fir lekha hoga You didn't register Check your Filled Details And Try Again After some Time if You Register and Details is Correct."
+                                // Means: after progress bar, always show that message regardless. 
+                                // But we also need to handle validation – if details not filled, we may show same? But we can also show a specific error? 
+                                // However the instructions say: even after correct details, show that message. So we will show it always after progress.
+                                // But we also must "verify hoga kii sab details fill hua kii nhi" → if not filled, we can show the same message but maybe add extra hint? 
+                                // We'll set the message to that exact text. To be safe, we show it always.
+                                // But if fields are missing, we can also highlight them, then show the message. 
+                                // We'll keep it consistent.
+                                // Set final message:
+                                modalIcon.textContent = '⚠️';
+                                modalTitle.textContent = 'Not Registered';
+                                modalMessage.innerHTML = `You didn't register.<br>Check your Filled Details And Try Again After some Time if You Register and Details is Correct.`;
+                                // if some fields are missing, we can also show which? but we keep as per prompt.
+                                // Show close button
+                                modalCloseBtn.style.display = 'block';
+                            } else {
+                                // actually we show same message even if invalid, but we also highlight fields
+                                modalIcon.textContent = '⚠️';
+                                modalTitle.textContent = 'Not Registered';
+                                modalMessage.innerHTML = `You didn't register.<br>Check your Filled Details And Try Again After some Time if You Register and Details is Correct.`;
+                                modalCloseBtn.style.display = 'block';
+                            }
+                        }, 200);
+                    } else {
+                        progressBar.style.width = progress + '%';
+                    }
+                }, 50); // fast but smooth
+            }
+
+            // ---------- VALIDATION & SUBMIT ----------
+            document.getElementById('accessBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // reset any previous error highlights
+                resetHighlights();
+
+                // check broker
+                const brokerSelected = (selectedBroker === 'stocko' || selectedBroker === 'upstox');
+                // check mobile: exactly 10 digits
+                const mobileValue = mobileInput.value.trim();
+                const isMobileValid = /^\d{10}$/.test(mobileValue);
+                // check link usage
+                const linkSelected = (selectedLinkUsage === 'yes' || selectedLinkUsage === 'no');
+
+                // highlight missing fields
+                if (!isMobileValid) {
+                    phoneWrapper.classList.add('error-highlight');
+                }
+
+                // even if fields missing, we show the popup with the same message but we still highlight.
+                // but requirement says "verify hoga kii sab details fill hua kii nhi" → we can show popup anyway.
+                // we pass isValid but we always show the same message.
+                // However we can decide to show different popup title? But keep as per text.
+                // We'll call showVerificationModal with a flag, but we always set the message to the same.
+                // But we can add extra note if invalid? Not needed, we keep consistent.
+                const allValid = brokerSelected && isMobileValid && linkSelected;
+                showVerificationModal(allValid);
+            });
+
+            // ---------- MODAL CLOSE ----------
+            modalCloseBtn.addEventListener('click', function() {
+                modalOverlay.classList.remove('active');
+                // reset progress bar width
+                progressBar.style.width = '0%';
+            });
+
+            // click outside to close? we can allow closing by overlay click, but better keep only button.
+            // But we add overlay click to close if user wants (only if close button visible)
+            modalOverlay.addEventListener('click', function(e) {
+                if (e.target === modalOverlay && modalCloseBtn.style.display === 'block') {
+                    modalOverlay.classList.remove('active');
+                    progressBar.style.width = '0%';
+                }
+            });
+
+            // ---------- ADDITIONAL: dynamic UI polish ----------
+            // ensure no broker selected initially
+            // we keep none selected; user must choose.
+
+            // For better UX, remove red border if input becomes valid
+            mobileInput.addEventListener('blur', function() {
+                if (/^\d{10}$/.test(this.value.trim())) {
+                    phoneWrapper.classList.remove('error-highlight');
+                }
+            });
+
+            // Also remove broker/toggle highlight? We don't highlight them, but we can add subtle missing?
+            // Not needed.
+
+            // If user clicks broker or toggle, remove any general error? We'll keep.
+            brokerStocko.addEventListener('click', () => {
+                // no highlight removal needed
+            });
+
+            // quick reset when modal opens, ensure progress bar visible
+            // also reset any lingering styles
+            window.addEventListener('load', function() {
+                // no initial selection
+                selectedBroker = null;
+                selectedLinkUsage = null;
+                // set progress bar hidden? We'll manage in modal.
+            });
+        })();
+    </script>
+</body>
+</html>
